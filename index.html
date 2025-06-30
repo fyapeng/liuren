@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小六壬在线起卦</title>
+    <style>
+        /* CSS 样式部分，用于美化页面 */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #4a4a4a;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #5a67d8;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+        button:hover {
+            background-color: #434190;
+        }
+        .result {
+            margin-top: 20px;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+        .result p {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-left: 4px solid #5a67d8;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .result h2 {
+            text-align: center;
+            color: #d9534f;
+            font-size: 28px;
+        }
+        .result .interpretation {
+            margin-top: 15px;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>小六壬在线起卦</h1>
+        <p>心有所动，即可起卦。请点击下方按钮。</p>
+        <button onclick="calculate()">按当前时间起卦</button>
+        <div id="result" class="result" style="display: none;">
+            <p id="time-info"></p>
+            <p id="calculation-process"></p>
+            <h2 id="gua-result"></h2>
+            <p id="jie-gua" class="interpretation"></p>
+        </div>
+    </div>
+
+    <!-- 引入一个公历转农历的JS库，这样我们就不需要自己写复杂的转换算法了 -->
+    <script src="https://unpkg.com/solarlunar/solarlunar.min.js"></script>
+    <script>
+        // JavaScript 逻辑部分
+        
+        // 定义六神（或称六宫）
+        const palaces = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
+        
+        // 定义每个卦象的解释
+        const interpretations = {
+            '大安': '【吉】身心安泰，诸事顺利。寻人、寻物在原地或附近。谋事可成，出行平安。',
+            '留连': '【凶】事有延迟，过程反复。寻人、寻物难见。谋事不宜，官司、纠纷难解。',
+            '速喜': '【吉】喜事即至，好事成双。寻人、寻物速见。谋事易成，有贵人相助。',
+            '赤口': '【凶】多有口舌是非，易生争执。寻人、寻物不见。谋事不成，谨防小人。',
+            '小吉': '【吉】将有小喜，合作有利。寻人、寻物可见。谋事小成，交易顺利。',
+            '空亡': '【凶】事多虚空，劳而无功。寻人、寻物无踪。谋事无望，所求之事成空。'
+        };
+
+        // 定义时辰与地支的对应关系（用于计算）
+        const hourMap = {
+            '子': 1, '丑': 2, '寅': 3, '卯': 4, '辰': 5, '巳': 6,
+            '午': 7, '未': 8, '申': 9, '酉': 10, '戌': 11, '亥': 12
+        };
+
+        function calculate() {
+            // 1. 获取当前时间
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            const hour = now.getHours();
+            const minute = now.getMinutes();
+            const second = now.getSeconds();
+
+            // 2. 将公历转换为农历
+            const lunarDate = solarLunar.solar2lunar(year, month, day);
+            const lunarMonth = lunarDate.lunarMonth; // 农历月份
+            const lunarDay = lunarDate.lunarDay;     // 农历日期
+            
+            // 获取当前时辰的地支
+            const solarTerm = solarLunar.lunar2solar(lunarDate.lunarYear, lunarMonth, lunarDay);
+            const timeGanZhi = solarLunar.time2GanZhi(hour, solarTerm.Zhi);
+            const hourZhi = timeGanZhi.slice(1,2); // 例如 "子", "丑"
+            const hourIndex = hourMap[hourZhi]; // 时辰对应的数字
+
+            // 3. 小六壬起卦计算
+            // 规则：从“大安”宫（索引为0）开始
+            // 月份落宫：(起始宫 + 农历月 - 1) % 6
+            let monthPalaceIndex = (lunarMonth - 1) % 6;
+            
+            // 日期落宫：(月份落宫 + 农历日 - 1) % 6
+            let dayPalaceIndex = (monthPalaceIndex + lunarDay - 1) % 6;
+
+            // 时辰落宫（最终结果）：(日期落宫 + 时辰序数 - 1) % 6
+            let finalPalaceIndex = (dayPalaceIndex + hourIndex - 1) % 6;
+
+            const resultGua = palaces[finalPalaceIndex];
+            const resultJie = interpretations[resultGua];
+
+            // 4. 显示结果到页面上
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+
+            document.getElementById('time-info').innerHTML = 
+                `<strong>起卦时间：</strong>公历 ${year}-${month}-${day} ${hour}:${minute}:${second}<br>` +
+                `<strong>对应农历：</strong>${lunarDate.lunarMonthName}${lunarDate.lunarDayName} ${hourZhi}时`;
+
+            document.getElementById('calculation-process').innerHTML = 
+                `<strong>推算过程：</strong><br>` +
+                `从 [大安] 起 <strong>${lunarMonth}</strong> 月，落在 [${palaces[monthPalaceIndex]}]。<br>` +
+                `从 [${palaces[monthPalaceIndex]}] 起 <strong>${lunarDay}</strong> 日，落在 [${palaces[dayPalaceIndex]}]。<br>` +
+                `从 [${palaces[dayPalaceIndex]}] 起 <strong>${hourZhi}</strong> 时，最终落在 [<strong>${resultGua}</strong>]。`;
+            
+            document.getElementById('gua-result').innerText = `【${resultGua}】`;
+            document.getElementById('jie-gua').innerText = resultJie;
+        }
+    </script>
+</body>
+</html>
