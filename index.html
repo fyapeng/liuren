@@ -80,7 +80,7 @@
             border-left: 4px solid #5a67d8;
             margin: 10px 0;
             line-height: 1.6;
-            word-wrap: break-word; /* 确保长字符串能换行 */
+            word-wrap: break-word;
         }
         .result h2 {
             text-align: center;
@@ -124,6 +124,10 @@
         </div>
     </div>
 
+    <!-- 
+      【重要调整】将所有 script 标签移动到 body 标签的末尾。
+      这是最稳妥的做法，确保在执行脚本前，页面已完全加载。
+    -->
     <script src="https://cdn.jsdelivr.net/npm/solarlunar/solarlunar.min.js"></script>
     <script>
         const palaces = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
@@ -156,9 +160,8 @@
                 const now = new Date();
                 const lunarDate = solarLunar.solar2lunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
                 
-                // 【关键修复】这里需要传入当天的“天干”，而不是“地支”
                 const solarTerm = solarLunar.lunar2solar(lunarDate.lunarYear, lunarDate.lunarMonth, lunarDate.lunarDay);
-                const timeGanZhi = solarLunar.time2GanZhi(now.getHours(), solarTerm.Gan); // <-- 这里已修正
+                const timeGanZhi = solarLunar.time2GanZhi(now.getHours(), solarTerm.Gan);
                 const hourZhi = timeGanZhi.slice(1,2);
                 const hourIndex = hourMap[hourZhi];
                 
@@ -178,8 +181,7 @@
 
                 displayResult(finalPalaceIndex, infoHtml, processHtml);
             } catch (error) {
-                // 如果还是出错，弹窗提示用户，并把错误信息打印到控制台，方便排查
-                alert('按时间起卦时发生错误！请检查网络连接或刷新页面重试。');
+                alert('按时间起卦时发生错误！这可能是由于网络问题导致农历库加载失败。请刷新页面重试。');
                 console.error("小六壬计算错误:", error);
             }
         }
@@ -207,5 +209,6 @@
             displayResult(finalPalaceIndex, infoHtml, processHtml);
         }
     </script>
+
 </body>
 </html>
