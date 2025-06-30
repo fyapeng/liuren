@@ -11,7 +11,7 @@
             color: #333;
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* 改为flex-start以适应更长的内容 */
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -80,6 +80,7 @@
             border-left: 4px solid #5a67d8;
             margin: 10px 0;
             line-height: 1.6;
+            word-wrap: break-word; /* 确保长字符串能换行 */
         }
         .result h2 {
             text-align: center;
@@ -98,14 +99,12 @@
     <div class="container">
         <h1>小六壬在线起卦</h1>
 
-        <!-- 方法一：按当前时间起卦 -->
         <div class="method-box">
             <h3>方法一：按当前时间</h3>
             <p>心有所动，即可起卦。系统将自动获取您当前的时间进行推算。</p>
             <button onclick="calculateByTime()">按当前时间起卦</button>
         </div>
 
-        <!-- 方法二：按数字起卦 -->
         <div class="method-box">
             <h3>方法二：任意三数</h3>
             <p>心中默念所问之事，随心输入三个正整数。</p>
@@ -117,7 +116,6 @@
             <button onclick="calculateByNumbers()">按输入数字起卦</button>
         </div>
 
-        <!-- 结果显示区域 -->
         <div id="result" class="result" style="display: none;">
             <p id="info"></p>
             <p id="calculation-process"></p>
@@ -126,13 +124,8 @@
         </div>
     </div>
 
-    <!-- 
-      【重要修复】更换了更稳定、更快速的CDN链接来加载solarlunar库 
-    -->
     <script src="https://cdn.jsdelivr.net/npm/solarlunar/solarlunar.min.js"></script>
     <script>
-        // JS 逻辑部分
-
         const palaces = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
         const interpretations = {
             '大安': '【吉】身心安泰，诸事顺利。寻人、寻物在原地或附近。谋事可成，出行平安。',
@@ -147,60 +140,60 @@
             '午': 7, '未': 8, '申': 9, '酉': 10, '戌': 11, '亥': 12
         };
 
-        // 统一的结果显示函数，避免代码重复
         function displayResult(finalIndex, infoHtml, processHtml) {
             const resultGua = palaces[finalIndex];
             const resultJie = interpretations[resultGua];
-
             const resultDiv = document.getElementById('result');
             resultDiv.style.display = 'block';
-
             document.getElementById('info').innerHTML = infoHtml;
             document.getElementById('calculation-process').innerHTML = processHtml;
             document.getElementById('gua-result').innerText = `【${resultGua}】`;
             document.getElementById('jie-gua').innerText = resultJie;
         }
 
-        // 方法一：按时间起卦
         function calculateByTime() {
-            const now = new Date();
-            const lunarDate = solarLunar.solar2lunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
-            
-            const solarTerm = solarLunar.lunar2solar(lunarDate.lunarYear, lunarDate.lunarMonth, lunarDate.lunarDay);
-            const timeGanZhi = solarLunar.time2GanZhi(now.getHours(), solarTerm.Zhi);
-            const hourZhi = timeGanZhi.slice(1,2);
-            const hourIndex = hourMap[hourZhi];
-            
-            const lunarMonth = lunarDate.lunarMonth;
-            const lunarDay = lunarDate.lunarDay;
+            try {
+                const now = new Date();
+                const lunarDate = solarLunar.solar2lunar(now.getFullYear(), now.getMonth() + 1, now.getDate());
+                
+                // 【关键修复】这里需要传入当天的“天干”，而不是“地支”
+                const solarTerm = solarLunar.lunar2solar(lunarDate.lunarYear, lunarDate.lunarMonth, lunarDate.lunarDay);
+                const timeGanZhi = solarLunar.time2GanZhi(now.getHours(), solarTerm.Gan); // <-- 这里已修正
+                const hourZhi = timeGanZhi.slice(1,2);
+                const hourIndex = hourMap[hourZhi];
+                
+                const lunarMonth = lunarDate.lunarMonth;
+                const lunarDay = lunarDate.lunarDay;
 
-            let monthPalaceIndex = (lunarMonth - 1) % 6;
-            let dayPalaceIndex = (monthPalaceIndex + lunarDay - 1) % 6;
-            let finalPalaceIndex = (dayPalaceIndex + hourIndex - 1) % 6;
+                let monthPalaceIndex = (lunarMonth - 1) % 6;
+                let dayPalaceIndex = (monthPalaceIndex + lunarDay - 1) % 6;
+                let finalPalaceIndex = (dayPalaceIndex + hourIndex - 1) % 6;
 
-            const infoHtml = `<strong>起卦时间：</strong>公历 ${now.toLocaleString()}<br>` +
-                           `<strong>对应农历：</strong>${lunarDate.lunarMonthName}${lunarDate.lunarDayName} ${hourZhi}时`;
-            const processHtml = `<strong>推算过程：</strong><br>` +
-                              `从 [大安] 起 <strong>${lunarMonth}</strong> 月，落在 [${palaces[monthPalaceIndex]}]。<br>` +
-                              `从 [${palaces[monthPalaceIndex]}] 起 <strong>${lunarDay}</strong> 日，落在 [${palaces[dayPalaceIndex]}]。<br>` +
-                              `从 [${palaces[dayPalaceIndex]}] 起 <strong>${hourZhi}</strong> 时，最终落在 [<strong>${palaces[finalPalaceIndex]}</strong>]。`;
+                const infoHtml = `<strong>起卦时间：</strong>公历 ${now.toLocaleString()}<br>` +
+                               `<strong>对应农历：</strong>${lunarDate.lunarMonthName}${lunarDate.lunarDayName} ${hourZhi}时`;
+                const processHtml = `<strong>推算过程：</strong><br>` +
+                                  `从 [大安] 起 <strong>${lunarMonth}</strong> 月，落在 [${palaces[monthPalaceIndex]}]。<br>` +
+                                  `从 [${palaces[monthPalaceIndex]}] 起 <strong>${lunarDay}</strong> 日，落在 [${palaces[dayPalaceIndex]}]。<br>` +
+                                  `从 [${palaces[dayPalaceIndex]}] 起 <strong>${hourZhi}</strong> 时，最终落在 [<strong>${palaces[finalPalaceIndex]}</strong>]。`;
 
-            displayResult(finalPalaceIndex, infoHtml, processHtml);
+                displayResult(finalPalaceIndex, infoHtml, processHtml);
+            } catch (error) {
+                // 如果还是出错，弹窗提示用户，并把错误信息打印到控制台，方便排查
+                alert('按时间起卦时发生错误！请检查网络连接或刷新页面重试。');
+                console.error("小六壬计算错误:", error);
+            }
         }
 
-        // 方法二：按数字起卦
         function calculateByNumbers() {
             const num1 = parseInt(document.getElementById('num1').value);
             const num2 = parseInt(document.getElementById('num2').value);
             const num3 = parseInt(document.getElementById('num3').value);
 
-            // 输入校验
             if (isNaN(num1) || isNaN(num2) || isNaN(num3) || num1 <= 0 || num2 <= 0 || num3 <= 0) {
                 alert('请输入三个有效的正整数！');
                 return;
             }
 
-            // 数字起卦法：从大安宫开始，按数字顺序依次掐算
             let palace1_index = (num1 - 1) % 6;
             let palace2_index = (palace1_index + num2 - 1) % 6;
             let finalPalaceIndex = (palace2_index + num3 - 1) % 6;
