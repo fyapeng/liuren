@@ -3,249 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小六壬在线推算</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #f4f7f9;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        .container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
-            width: 100%;
-            text-align: center;
-        }
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        .info-panel {
-            text-align: left;
-            margin-bottom: 25px;
-            padding: 15px;
-            background-color: #ecf0f1;
-            border-radius: 8px;
-            border-left: 5px solid #3498db;
-        }
-        .info-panel p {
-            margin: 8px 0;
-            font-size: 16px;
-            line-height: 1.6;
-        }
-        .info-panel strong {
-            color: #3498db;
-        }
-        .process, .result {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 8px;
-        }
-        .process {
-            background-color: #e8f6f3;
-            border: 1px solid #a2d9ce;
-            text-align: left;
-        }
-        .process h2, .result h2 {
-            margin-top: 0;
-            color: #16a085;
-            font-size: 18px;
-            border-bottom: 2px solid #a2d9ce;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
-        .result h2 {
-            color: #c0392b;
-            border-bottom-color: #f5b7b1;
-        }
-        .result {
-            background-color: #fdedec;
-            border: 1px solid #f5b7b1;
-        }
-        .result-text {
-            font-size: 28px;
-            font-weight: bold;
-            color: #e74c3c;
-        }
-        button {
-            background-color: #3498db;
-            color: white;
-            border: none;
-            padding: 12px 25px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            margin-top: 20px;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        button:active {
-            transform: scale(0.98);
-        }
-        .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #95a5a6;
-        }
-    </style>
+    <title>小六壬在线起卦</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>小六壬在线推算</h1>
+    <h1>小六壬在线起卦</h1>
 
-    <div class="info-panel">
-        <p><strong>公历时间:</strong> <span id="solar-time"></span></p>
-        <p><strong>农历时间:</strong> <span id="lunar-time"></span></p>
-        <p><strong>当前时辰:</strong> <span id="hour-branch"></span></p>
+    <div class="tabs">
+        <button class="tab-link active" onclick="openTab(event, 'TimeMode')">按当前时间</button>
+        <button class="tab-link" onclick="openTab(event, 'NumberMode')">按随机数字</button>
     </div>
 
-    <div class="process">
-        <h2>推算过程</h2>
-        <div id="calculation-process"></div>
+    <!-- 按当前时间起卦 -->
+    <div id="TimeMode" class="tab-content" style="display: block;">
+        <div class="info-panel">
+            <p><strong>公历时间:</strong> <span id="solar-time"></span></p>
+            <p><strong>农历时间:</strong> <span id="lunar-time"></span></p>
+            <p><strong>当前时辰:</strong> <span id="hour-branch"></span></p>
+        </div>
+        <div class="process">
+            <h2>推算过程</h2>
+            <div id="time-calculation-process"></div>
+        </div>
+        <button onclick="runTimeCalculation()">重新推算</button>
     </div>
 
-    <div class="result">
-        <h2>推算结果</h2>
-        <p class="result-text" id="final-result"></p>
+    <!-- 按随机数字起卦 -->
+    <div id="NumberMode" class="tab-content">
+        <div class="info-panel">
+            <p>请输入三个1-1000内的任意数字，代表您心中所想，模拟天、地、人三才起卦。</p>
+            <div class="number-inputs">
+                <input type="number" id="num1" placeholder="数字一">
+                <input type="number" id="num2" placeholder="数字二">
+                <input type="number" id="num3" placeholder="数字三">
+            </div>
+        </div>
+         <div class="process">
+            <h2>推算过程</h2>
+            <div id="number-calculation-process"></div>
+        </div>
+        <button onclick="runNumberCalculation()">开始推算</button>
     </div>
 
-    <button onclick="runCalculation()">重新推算</button>
+    <!-- 统一的结果显示区域 -->
+    <div id="result-container" class="result" style="display: none;">
+        <div id="result-header">
+            <span class="result-name" id="final-result-name"></span>
+            <span class="result-fortune" id="final-result-fortune"></span>
+        </div>
+        <div id="result-body">
+            <p><strong>核心涵义：</strong><span id="result-meaning"></span></p>
+            <p><strong>事态分析：</strong><span id="result-analysis"></span></p>
+        </div>
+    </div>
+    
     <div class="footer">
-        公农历转换算法由 Jea杨 提供
+        <p>本项目由 YAPO 制作(<a href="https://github.com/fyapeng/liuren" target="_blank" rel="noopener noreferrer">GitHub地址</a>)</p>
+        <p>公农历转换算法由 Jea杨 提供</p>
     </div>
 </div>
 
-<script>
-// 您提供的 calendar.js 代码
-var calendar = {
-    lunarInfo:[0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x16554,0x056a0,0x09ad0,0x055d2,0x04ae0,0x0a5b6,0x0a4d0,0x0d250,0x1d255,0x0b540,0x0d6a0,0x0ada2,0x095b0,0x14977,0x04970,0x0a4b0,0x0b4b5,0x06a50,0x06d40,0x1ab54,0x02b60,0x09570,0x052f2,0x04970,0x06566,0x0d4a0,0x0ea50,0x06e95,0x05ad0,0x02b60,0x186e3,0x092e0,0x1c8d7,0x0c950,0x0d4a0,0x1d8a6,0x0b550,0x056a0,0x1a5b4,0x025d0,0x092d0,0x0d2b2,0x0a950,0x0b557,0x06ca0,0x0b550,0x15355,0x04da0,0x0a5b0,0x14573,0x052b0,0x0a9a8,0x0e950,0x06aa0,0x0aea6,0x0ab50,0x04b60,0x0aae4,0x0a570,0x05260,0x0f263,0x0d950,0x05b57,0x056a0,0x096d0,0x04dd5,0x04ad0,0x0a4d0,0x0d4d4,0x0d250,0x0d558,0x0b540,0x0b6a0,0x195a6,0x095b0,0x049b0,0x0a974,0x0a4b0,0x0b27a,0x06a50,0x06d40,0x0af46,0x0ab60,0x09570,0x04af5,0x04970,0x064b0,0x074a3,0x0ea50,0x06b58,0x055c0,0x0ab60,0x096d5,0x092e0,0x0c960,0x0d954,0x0d4a0,0x0da50,0x07552,0x056a0,0x0abb7,0x025d0,0x092d0,0x0cab5,0x0a950,0x0b4a0,0x0baa4,0x0ad50,0x055d9,0x04ba0,0x0a5b0,0x15176,0x052b0,0x0a930,0x07954,0x06aa0,0x0ad50,0x05b52,0x04b60,0x0a6e6,0x0a4e0,0x0d260,0x0ea65,0x0d530,0x05aa0,0x076a3,0x096d0,0x04afb,0x04ad0,0x0a4d0,0x1d0b6,0x0d250,0x0d520,0x0dd45,0x0b5a0,0x056d0,0x055b2,0x049b0,0x0a577,0x0a4b0,0x0aa50,0x1b255,0x06d20,0x0ada0,0x14b63,0x09370,0x049f8,0x04970,0x064b0,0x168a6,0x0ea50,0x06b20,0x1a6c4,0x0aae0,0x0a2e0,0x0d2e3,0x0c960,0x0d557,0x0d4a0,0x0da50,0x05d55,0x056a0,0x0a6d0,0x055d4,0x052d0,0x0a9b8,0x0a950,0x0b4a0,0x0b6a6,0x0ad50,0x055a0,0x0aba4,0x0a5b0,0x052b0,0x0b273,0x06930,0x07337,0x06aa0,0x0ad50,0x14b55,0x04b60,0x0a570,0x054e4,0x0d160,0x0e968,0x0d520,0x0daa0,0x16aa6,0x056d0,0x04ae0,0x0a9d4,0x0a2d0,0x0d150,0x0f252,0x0d520],
-    solarMonth:[31,28,31,30,31,30,31,31,30,31,30,31],
-    Gan:["\u7532","\u4e59","\u4e19","\u4e01","\u620a","\u5df1","\u5e9a","\u8f9b","\u58ec","\u7678"],
-    Zhi:["\u5b50","\u4e11","\u5bc5","\u536f","\u8fb0","\u5df3","\u5348","\u672a","\u7533","\u9149","\u620c","\u4ea5"],
-    Animals:["\u9f20","\u725b","\u864e","\u5154","\u9f99","\u86c7","\u9a6c","\u7f8a","\u7334","\u9e21","\u72d7","\u732a"],
-    solarTerm:["\u5c0f\u5bd2","\u5927\u5bd2","\u7acb\u6625","\u96e8\u6c34","\u60ca\u86f0","\u6625\u5206","\u6e05\u660e","\u8c37\u96e8","\u7acb\u590f","\u5c0f\u6ee1","\u8292\u79cd","\u590f\u81f3","\u5c0f\u6691","\u5927\u6691","\u7acb\u79cb","\u5904\u6691","\u767d\u9732","\u79cb\u5206","\u5bd2\u9732","\u971c\u964d","\u7acb\u51ac","\u5c0f\u96ea","\u5927\u96ea","\u51ac\u81f3"],
-    sTermInfo:['9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c3598082c95f8c965cc920f','97bd0b06bdb0722c965ce1cfcc920f','b027097bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd0b06bdb0722c965ce1cfcc920f','b027097bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd0b06bdb0722c965ce1cfcc920f','b027097bd097c36b0b6fc9274c91aa','9778397bd19801ec9210c965cc920e','97b6b97bd19801ec95f8c965cc920f','97bd09801d98082c95f8e1cfcc920f','97bd097bd097c36b0b6fc9210c8dc2','9778397bd197c36c9210c9274c91aa','97b6b97bd19801ec95f8c965cc920e','97bd09801d98082c95f8e1cfcc920f','97bd097bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c91aa','97b6b97bd19801ec95f8c965cc920e','97bcf97c3598082c95f8e1cfcc920f','97bd097bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c3598082c95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c3598082c95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd097bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf97c359801ec95f8c965cc920f','97bd097bd07f595b0b6fc920fb0722','9778397bd097c36b0b6fc9210c8dc2','9778397bd19801ec9210c9274c920e','97b6b97bd19801ec95f8c965cc920f','97bd07f5307f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c920e','97b6b97bd19801ec95f8c965cc920f','97bd07f5307f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c91aa','97b6b97bd19801ec9210c965cc920e','97bd07f1487f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf7f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf7f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf7f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c965cc920e','97bcf7f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b97bd19801ec9210c9274c920e','97bcf7f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9210c91aa','97b6b97bd197c36c9210c9274c920e','97bcf7f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9210c8dc2','9778397bd097c36c9210c9274c920e','97b6b7f0e47f531b0723b0b6fb0722','7f0e37f5307f595b0b0bc920fb0722','7f0e397bd097c36b0b6fc9210c8dc2','9778397bd097c36b0b70c9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e37f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc9210c8dc2','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e27f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9274c91aa','97b6b7f0e47f531b0723b0787b0721','7f0e27f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9210c91aa','97b6b7f0e47f149b0723b0787b0721','7f0e27f0e47f531b0723b0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','9778397bd097c36b0b6fc9210c8dc2','977837f0e37f149b0723b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e37f5307f595b0b0bc920fb0722','7f0e397bd097c35b0b6fc9210c8dc2','977837f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0721','7f0e37f1487f595b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc9210c8dc2','977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd097c35b0b6fc920fb0722','977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14998082b0787b06bd','7f07e7f0e47f149b0723b0787b0721','7f0e27f0e47f531b0b0bb0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14998082b0723b06bd','7f07e7f0e37f149b0723b0787b0721','7f0e27f0e47f531b0723b0b6fb0722','7f0e397bd07f595b0b0bc920fb0722','977837f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e37f1487f595b0b0bb0b6fb0722','7f0e37f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e37f1487f531b0b0bb0b6fb0722','7f0e37f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e37f1487f531b0b0bb0b6fb0722','7f0e37f0e37f14898082b072297c35','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e37f0e37f14898082b072297c35','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f149b0723b0787b0721','7f0e27f1487f531b0b0bb0b6fb0722','7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14998082b0723b06bd','7f07e7f0e47f149b0723b0787b0721','7f0e27f0e47f531b0723b0b6fb0722','7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14998082b0723b06bd','7f07e7f0e37f14998083b0787b0721','7f0e27f0e47f531b0723b0b6fb0722','7f0e37f0e366aa89801eb072297c35','7ec967f0e37f14898082b0723b02d5','7f07e7f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e36665b66aa89801e9808297c35','665f67f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b0721','7f07e7f0e47f531b0723b0b6fb0722','7f0e36665b66a449801e9808297c35','665f67f0e37f14898082b0723b02d5','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e36665b66a449801e9808297c35','665f67f0e37f14898082b072297c35','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e26665b66a449801e9808297c35','665f67f0e37f1489801eb072297c35','7ec967f0e37f14998082b0787b06bd','7f07e7f0e47f531b0723b0b6fb0721','7f0e27f1487f531b0b0bb0b6fb0722'],
-    nStr1:["\u65e5","\u4e00","\u4e8c","\u4e09","\u56db","\u4e94","\u516d","\u4e03","\u516b","\u4e5d","\u5341"],
-    nStr2:["\u521d","\u5341","\u5eff","\u5345"],
-    nStr3:["\u6b63","\u4e8c","\u4e09","\u56db","\u4e94","\u516d","\u4e03","\u516b","\u4e5d","\u5341","\u51ac","\u814a"],
-    lYearDays:function(y){var i,sum=348;for(i=0x8000;i>0x8;i>>=1)sum+=(this.lunarInfo[y-1900]&i)?1:0;return sum+this.leapDays(y)},
-    leapMonth:function(y){return this.lunarInfo[y-1900]&0xf},
-    leapDays:function(y){if(this.leapMonth(y))return(this.lunarInfo[y-1900]&0x10000)?30:29;return 0},
-    monthDays:function(y,m){if(m>12||m<1)return-1;return(this.lunarInfo[y-1900]&(0x10000>>m))?30:29},
-    solarDays:function(y,m){if(m>12||m<1)return-1;var ms=m-1;if(ms==1)return(y%4==0&&y%100!=0)||(y%400==0)?29:28;else return this.solarMonth[ms]},
-    toGanZhiYear:function(lYear){var ganKey=(lYear-3)%10;var zhiKey=(lYear-3)%12;if(ganKey==0)ganKey=10;if(zhiKey==0)zhiKey=12;return this.Gan[ganKey-1]+this.Zhi[zhiKey-1]},
-    toAstro:function(cMonth,cDay){var s="\u9b54\u7faf\u6c34\u74f6\u53cc\u9c7c\u767d\u7f8a\u91d1\u725b\u53cc\u5b50\u5de8\u87f9\u72ee\u5b50\u5904\u5973\u5929\u79e4\u5929\u874e\u5c04\u624b\u9b54\u7faf";var arr=[20,19,21,21,21,22,23,23,23,23,22,22];return s.substr(cMonth*2-(cDay<arr[cMonth-1]?2:0),2)+"\u5ea7"},
-    toGanZhi:function(offset){return this.Gan[offset%10]+this.Zhi[offset%12]},
-    getTerm:function(y,n){if(y<1900||y>2100)return-1;if(n<1||n>24)return-1;var _table=this.sTermInfo[y-1900];var _info=[parseInt('0x'+_table.substr(0,5)).toString(),parseInt('0x'+_table.substr(5,5)).toString(),parseInt('0x'+_table.substr(10,5)).toString(),parseInt('0x'+_table.substr(15,5)).toString(),parseInt('0x'+_table.substr(20,5)).toString(),parseInt('0x'+_table.substr(25,5)).toString()];var _calday=[_info[0].substr(0,1),_info[0].substr(1,2),_info[0].substr(3,1),_info[0].substr(4,2),_info[1].substr(0,1),_info[1].substr(1,2),_info[1].substr(3,1),_info[1].substr(4,2),_info[2].substr(0,1),_info[2].substr(1,2),_info[2].substr(3,1),_info[2].substr(4,2),_info[3].substr(0,1),_info[3].substr(1,2),_info[3].substr(3,1),_info[3].substr(4,2),_info[4].substr(0,1),_info[4].substr(1,2),_info[4].substr(3,1),_info[4].substr(4,2),_info[5].substr(0,1),_info[5].substr(1,2),_info[5].substr(3,1),_info[5].substr(4,2)];return parseInt(_calday[n-1])},
-    toChinaMonth:function(m){if(m>12||m<1)return-1;var s=this.nStr3[m-1];s+="\u6708";return s},
-    toChinaDay:function(d){var s;switch(d){case 10:s='\u521d\u5341';break;case 20:s='\u4e8c\u5341';break;case 30:s='\u4e09\u5341';break;default:s=this.nStr2[Math.floor(d/10)];s+=this.nStr1[d%10]}return s},
-    getAnimal:function(y){return this.Animals[(y-4)%12]},
-    solar2lunar:function(y,m,d){if(y<1900||y>2100)return-1;if(y==1900&&m==1&&d<31)return-1;if(!y){var objDate=new Date}else{var objDate=new Date(y,parseInt(m)-1,d)}var i,leap=0,temp=0;var y=objDate.getFullYear(),m=objDate.getMonth()+1,d=objDate.getDate();var offset=(Date.UTC(objDate.getFullYear(),objDate.getMonth(),objDate.getDate())-Date.UTC(1900,0,31))/86400000;for(i=1900;i<2101&&offset>0;i++){temp=this.lYearDays(i);offset-=temp}if(offset<0){offset+=temp;i--}var isTodayObj=new Date(),isToday=false;if(isTodayObj.getFullYear()==y&&isTodayObj.getMonth()+1==m&&isTodayObj.getDate()==d){isToday=true}var nWeek=objDate.getDay(),cWeek=this.nStr1[nWeek];if(nWeek==0){nWeek=7}var year=i;var leap=this.leapMonth(i);var isLeap=false;for(i=1;i<13&&offset>0;i++){if(leap>0&&i==(leap+1)&&isLeap==false){--i;isLeap=true;temp=this.leapDays(year)}else{temp=this.monthDays(year,i)}if(isLeap==true&&i==(leap+1)){isLeap=false}offset-=temp}if(offset==0&&leap>0&&i==leap+1){if(isLeap){isLeap=false}else{isLeap=true;--i}}if(offset<0){offset+=temp;--i}var month=i;var day=offset+1;var sm=m-1;var gzY=this.toGanZhiYear(year);var firstNode=this.getTerm(y,(m*2-1));var secondNode=this.getTerm(y,(m*2));var gzM=this.toGanZhi((y-1900)*12+m+11);if(d>=firstNode){gzM=this.toGanZhi((y-1900)*12+m+12)}var isTerm=false;var Term=null;if(firstNode==d){isTerm=true;Term=this.solarTerm[m*2-2]}if(secondNode==d){isTerm=true;Term=this.solarTerm[m*2-1]}var dayCyclical=Date.UTC(y,sm,1,0,0,0,0)/86400000+25567+10;var gzD=this.toGanZhi(dayCyclical+d-1);var astro=this.toAstro(m,d);return{'lYear':year,'lMonth':month,'lDay':day,'Animal':this.getAnimal(year),'IMonthCn':(isLeap?"\u95f0":'')+this.toChinaMonth(month),'IDayCn':this.toChinaDay(day),'cYear':y,'cMonth':m,'cDay':d,'gzYear':gzY,'gzMonth':gzM,'gzDay':gzD,'isToday':isToday,'isLeap':isLeap,'nWeek':nWeek,'ncWeek':"\u661f\u671f"+cWeek,'isTerm':isTerm,'Term':Term,'astro':astro}},
-    lunar2solar:function(y,m,d,isLeapMonth){var isLeapMonth=!!isLeapMonth;var leapOffset=0;var leapMonth=this.leapMonth(y);var leapDay=this.leapDays(y);if(isLeapMonth&&(leapMonth!=m)){return-1}if(y==2100&&m==12&&d>1||y==1900&&m==1&&d<31){return-1}var day=this.monthDays(y,m);var _day=day;if(isLeapMonth){_day=this.leapDays(y,m)}if(y<1900||y>2100||d>_day){return-1}var offset=0;for(var i=1900;i<y;i++){offset+=this.lYearDays(i)}var leap=0,isAdd=false;for(var i=1;i<m;i++){leap=this.leapMonth(y);if(!isAdd){if(leap<=i&&leap>0){offset+=this.leapDays(y);isAdd=true}}offset+=this.monthDays(y,i)}if(isLeapMonth){offset+=day}var stmap=Date.UTC(1900,1,30,0,0,0);var calObj=new Date((offset+d-31)*86400000+stmap);var cY=calObj.getUTCFullYear();var cM=calObj.getUTCMonth()+1;var cD=calObj.getUTCDate();return this.solar2lunar(cY,cM,cD)}
-};
-
-// =================================================================
-// ===== 以下是小六壬推算的核心逻辑 =====
-// =================================================================
-
-// 定义小六壬的六个宫位
-const xiaoLiuRenPalaces = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
-
-// 定义十二地支（时辰）
-const earthlyBranches = calendar.Zhi; // 直接使用calendar库里的地支 ["子", "丑", "寅", "卯", "辰", "巳", "午", "未", "申", "酉", "戌", "亥"]
-
-/**
- * 根据小时计算当前时辰的地支索引 (0-11)
- * @param {number} hour - 24小时制的小时 (0-23)
- * @returns {number} 地支的索引
- */
-function getHourBranchIndex(hour) {
-    // 子时(23-1点)为第0个地支, 丑时(1-3点)为第1个, 以此类推
-    return Math.floor((hour + 1) / 2) % 12;
-}
-
-/**
- * 主计算函数
- */
-function runCalculation() {
-    // 1. 获取当前公历时间
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth() + 1; // getMonth()返回0-11,需+1
-    const day = now.getDate();
-    const hour = now.getHours();
-    const minute = now.getMinutes();
-    const second = now.getSeconds();
-
-    // 格式化公历时间并显示
-    document.getElementById('solar-time').textContent = 
-        `${year}年${month}月${day}日 ${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:${String(second).padStart(2, '0')}`;
-    
-    // 2. 将公历转换为农历
-    const lunarData = calendar.solar2lunar(year, month, day);
-    if (!lunarData) {
-        alert("日期转换失败，可能超出了1900-2100年的范围。");
-        return;
-    }
-
-    const lunarMonth = lunarData.lMonth;
-    const lunarDay = lunarData.lDay;
-    
-    // 显示农历时间
-    document.getElementById('lunar-time').textContent = 
-        `${lunarData.gzYear}年 ${lunarData.IMonthCn}${lunarData.IDayCn}`;
-
-    // 3. 获取当前时辰
-    const hourIndex = getHourBranchIndex(hour);
-    const currentHourBranch = earthlyBranches[hourIndex]; // 获取时辰中文名
-    document.getElementById('hour-branch').textContent = `${currentHourBranch}时 (${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')})`;
-
-
-    // 4. 执行小六壬推算
-    // 小六壬的索引从0开始 (大安=0, 留连=1, ...)
-    let processHtml = '';
-
-    // 从"大安"起正月, 顺数至月份
-    // (lunarMonth - 1) 是因为月份从1开始, 而我们的计算从0开始
-    const monthPositionIndex = (lunarMonth - 1) % 6;
-    const monthPositionName = xiaoLiuRenPalaces[monthPositionIndex];
-    processHtml += `<p>① 从【大安】起正月，顺数到【${lunarData.IMonthCn}】，落在【<b>${monthPositionName}</b>】</p>`;
-
-    // 从月份落宫处起初一, 顺数至日期
-    // (lunarDay - 1) 同理
-    const dayPositionIndex = (monthPositionIndex + lunarDay - 1) % 6;
-    const dayPositionName = xiaoLiuRenPalaces[dayPositionIndex];
-    processHtml += `<p>② 从月上【${monthPositionName}】起初一，顺数到【${lunarData.IDayCn}】，落在【<b>${dayPositionName}</b>】</p>`;
-
-    // 从日期落宫处起子时, 顺数至当前时辰
-    const finalIndex = (dayPositionIndex + hourIndex) % 6;
-    const finalResultName = xiaoLiuRenPalaces[finalIndex];
-    processHtml += `<p>③ 从日上【${dayPositionName}】起子时，顺数到【${currentHourBranch}时】，最终落在【<b>${finalResultName}</b>】</p>`;
-
-    // 5. 显示推算过程和结果
-    document.getElementById('calculation-process').innerHTML = processHtml;
-    document.getElementById('final-result').textContent = finalResultName;
-}
-
-// 页面加载后立即执行一次
-window.onload = function() {
-    runCalculation();
-};
-
-</script>
+<script src="scripts.js"></script>
 </body>
 </html>
