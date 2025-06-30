@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小六壬在线起卦</title>
+    <title>小六壬智能推算</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>小六壬在线起卦</h1>
+    <h1>小六壬智能推算</h1>
 
     <div class="tabs">
         <button class="tab-link active" onclick="openTab(event, 'TimeMode')">按当前时间</button>
@@ -23,9 +23,13 @@
             <p><strong>农历时间:</strong> <span id="lunar-time"></span></p>
             <p><strong>当前时辰:</strong> <span id="hour-branch"></span></p>
         </div>
-        <div class="process">
-            <h2>推算过程</h2>
-            <div id="time-calculation-process"></div>
+        <div class="output-wrapper">
+            <div class="process">
+                <h2>推算过程</h2>
+                <div id="time-calculation-process"></div>
+            </div>
+            <!-- 时间模式的结果容器 -->
+            <div id="time-result-container" class="result"></div>
         </div>
         <button onclick="runTimeCalculation()">重新推算</button>
     </div>
@@ -35,35 +39,42 @@
         <div class="info-panel">
             <p>请输入三个1-1000内的任意数字，代表您心中所想，模拟天、地、人三才起卦。</p>
             <div class="number-inputs">
-                <input type="number" id="num1" placeholder="数字一">
-                <input type="number" id="num2" placeholder="数字二">
-                <input type="number" id="num3" placeholder="数字三">
+                <input type="number" id="num1" placeholder="数字一" value="168">
+                <input type="number" id="num2" placeholder="数字二" value="58">
+                <input type="number" id="num3" placeholder="数字三" value="99">
             </div>
         </div>
-         <div class="process">
-            <h2>推算过程</h2>
-            <div id="number-calculation-process"></div>
+        <div class="output-wrapper">
+             <div class="process">
+                <h2>推算过程</h2>
+                <div id="number-calculation-process"></div>
+            </div>
+            <!-- 数字模式的结果容器 -->
+            <div id="number-result-container" class="result"></div>
         </div>
         <button onclick="runNumberCalculation()">开始推算</button>
     </div>
-
-    <!-- 统一的结果显示区域 -->
-    <div id="result-container" class="result" style="display: none;">
-        <div id="result-header">
-            <span class="result-name" id="final-result-name"></span>
-            <span class="result-fortune" id="final-result-fortune"></span>
-        </div>
-        <div id="result-body">
-            <p><strong>核心涵义：</strong><span id="result-meaning"></span></p>
-            <p><strong>事态分析：</strong><span id="result-analysis"></span></p>
-        </div>
-    </div>
     
     <div class="footer">
-        <p>本项目由 YAPO 制作(<a href="https://github.com/fyapeng/liuren" target="_blank" rel="noopener noreferrer">GitHub地址</a>)</p>
-        <p>公农历转换算法由 Jea杨 提供</p>
+        <p>本项目由 YAPO 制作(<a href="https://github.com/fyapeng/liuren/" target="_blank" rel="noopener noreferrer">GitHub地址</a>)</p>
+        <p>公农历转换算法来自网络，可能存在偏差</p>
+        <p class="disclaimer">科学生活，理性看待，玄学仅供娱乐参考。</p>
     </div>
 </div>
+
+<!-- 结果模板 (由JS克隆使用) -->
+<template id="result-template">
+    <div class="result-content">
+        <div class="result-header">
+            <span class="result-name"></span>
+            <span class="result-fortune"></span>
+        </div>
+        <div class="result-body">
+            <p><strong>核心涵义：</strong><span class="result-meaning"></span></p>
+            <p><strong>事态分析：</strong><span class="result-analysis"></span></p>
+        </div>
+    </div>
+</template>
 
 <script src="scripts.js"></script>
 </body>

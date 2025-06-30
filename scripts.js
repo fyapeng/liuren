@@ -5,56 +5,20 @@ var calendar = {lunarInfo:[0x04bd8,0x04ae0,0x0a570,0x054d5,0x0d260,0x0d950,0x165
 // ===== 以下是小六壬推算的核心逻辑 =====
 // =================================================================
 
-// 定义小六壬的六个宫位
 const xiaoLiuRenPalaces = ['大安', '留连', '速喜', '赤口', '小吉', '空亡'];
-const earthlyBranches = calendar.Zhi; 
-
-// 新增：小六壬解卦数据
 const palaceInterpretations = {
-    '大安': {
-        fortune: '吉',
-        fortuneClass: 'good',
-        meaning: '身心安泰，诸事稳定。',
-        analysis: '此为吉卦，代表稳定、安宁和顺利。适宜采取稳健的策略，不宜冒进。所问之事进展顺利，结果多为正面。利于求财、婚姻、出行和谋事，但需要耐心等待时机。'
-    },
-    '留连': {
-        fortune: '半吉半凶',
-        fortuneClass: 'neutral',
-        meaning: '事有延迟，纠缠不清。',
-        analysis: '此卦带有延迟和纠缠的意味。所问之事进展缓慢，中间可能会有波折和阻碍。需要有极大的耐心和毅力去处理，问题不易速决。不宜做重大决策，最好静观其变。'
-    },
-    '速喜': {
-        fortune: '吉',
-        fortuneClass: 'good',
-        meaning: '喜事将近，好事速来。',
-        analysis: '此为大吉之卦，代表有突如其来的好消息或喜事。所问之事能快速达成，且结果令人满意。特别利于求财、感情和各种短期计划。应抓住时机，果断行动。'
-    },
-    '赤口': {
-        fortune: '凶',
-        fortuneClass: 'bad',
-        meaning: '口舌是非，官司破财。',
-        analysis: '此为凶卦，主要预示着冲突、争执和是非。处理事情时容易遇到小人或发生激烈争吵。不利于合作、谈判和诉讼。建议保持冷静，谨言慎行，避免与人发生正面冲突。'
-    },
-    '小吉': {
-        fortune: '吉',
-        fortuneClass: 'good',
-        meaning: '小有喜事，合作顺利。',
-        analysis: '此为吉卦，虽不如速喜来得快，但代表事情正在朝好的方向发展。特别有利于合作、合伙项目，能得到贵人相助。事情虽有小成，但已是很好的开端，未来可期。'
-    },
-    '空亡': {
-        fortune: '凶',
-        fortuneClass: 'bad',
-        meaning: '事多虚空，劳而无功。',
-        analysis: '此为凶卦，代表空虚、失落和徒劳无功。所问之事可能没有结果，或者之前的努力付诸东流。信息不实，希望渺茫。此时不宜抱有太大期望，应重新审视计划，或暂时搁置。'
-    }
+    '大安': { fortune: '吉', fortuneClass: 'good', meaning: '身心安泰，诸事稳定。', analysis: '此为吉卦，代表稳定、安宁和顺利。适宜采取稳健的策略，不宜冒进。所问之事进展顺利，结果多为正面。利于求财、婚姻、出行和谋事，但需要耐心等待时机。' },
+    '留连': { fortune: '半吉半凶', fortuneClass: 'neutral', meaning: '事有延迟，纠缠不清。', analysis: '此卦带有延迟和纠缠的意味。所问之事进展缓慢，中间可能会有波折和阻碍。需要有极大的耐心和毅力去处理，问题不易速决。不宜做重大决策，最好静观其变。' },
+    '速喜': { fortune: '吉', fortuneClass: 'good', meaning: '喜事将近，好事速来。', analysis: '此为大吉之卦，代表有突如其来的好消息或喜事。所问之事能快速达成，且结果令人满意。特别利于求财、感情和各种短期计划。应抓住时机，果断行动。' },
+    '赤口': { fortune: '凶', fortuneClass: 'bad', meaning: '口舌是非，官司破财。', analysis: '此为凶卦，主要预示着冲突、争执和是非。处理事情时容易遇到小人或发生激烈争吵。不利于合作、谈判和诉讼。建议保持冷静，谨言慎行，避免与人发生正面冲突。' },
+    '小吉': { fortune: '吉', fortuneClass: 'good', meaning: '小有喜事，合作顺利。', analysis: '此为吉卦，虽不如速喜来得快，但代表事情正在朝好的方向发展。特别有利于合作、合伙项目，能得到贵人相助。事情虽有小成，但已是很好的开端，未来可期。' },
+    '空亡': { fortune: '凶', fortuneClass: 'bad', meaning: '事多虚空，劳而无功。', analysis: '此为凶卦，代表空虚、失落和徒劳无功。所问之事可能没有结果，或者之前的努力付诸东流。信息不实，希望渺茫。此时不宜抱有太大期望，应重新审视计划，或暂时搁置。' }
 };
 
-// 页面加载完成后运行
 document.addEventListener('DOMContentLoaded', function() {
-    runTimeCalculation(); // 默认执行一次时间推算
+    runTimeCalculation();
 });
 
-// 标签页切换逻辑
 function openTab(evt, tabName) {
     let i, tabcontent, tablinks;
     tabcontent = document.getElementsByClassName("tab-content");
@@ -67,21 +31,12 @@ function openTab(evt, tabName) {
     }
     document.getElementById(tabName).style.display = "block";
     evt.currentTarget.className += " active";
-
-    // 切换时清空结果
-    document.getElementById('result-container').style.display = 'none';
 }
 
-/**
- * 根据小时计算当前时辰的地支索引 (0-11)
- */
 function getHourBranchIndex(hour) {
     return Math.floor((hour + 1) / 2) % 12;
 }
 
-/**
- * 按当前时间推算
- */
 function runTimeCalculation() {
     const now = new Date();
     const year = now.getFullYear(), month = now.getMonth() + 1, day = now.getDate(), hour = now.getHours(), minute = now.getMinutes(), second = now.getSeconds();
@@ -91,79 +46,66 @@ function runTimeCalculation() {
     const lunarData = calendar.solar2lunar(year, month, day);
     if (!lunarData) { alert("日期转换失败，可能超出了1900-2100年的范围。"); return; }
     
-    const lunarMonth = lunarData.lMonth, lunarDay = lunarData.lDay;
     document.getElementById('lunar-time').textContent = `${lunarData.gzYear}年 ${lunarData.IMonthCn}${lunarData.IDayCn}`;
 
     const hourIndex = getHourBranchIndex(hour);
-    const currentHourBranch = earthlyBranches[hourIndex];
-    document.getElementById('hour-branch').textContent = `${currentHourBranch}时 (${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')})`;
+    document.getElementById('hour-branch').textContent = `${calendar.Zhi[hourIndex]}时 (${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')})`;
 
-    let processHtml = '';
-    const monthPositionIndex = (lunarMonth - 1) % 6;
-    const monthPositionName = xiaoLiuRenPalaces[monthPositionIndex];
-    processHtml += `<p>① 从【大安】起正月，顺数到农历【${lunarData.IMonthCn}】，落在【<b>${monthPositionName}</b>】</p>`;
-
-    const dayPositionIndex = (monthPositionIndex + lunarDay - 1) % 6;
-    const dayPositionName = xiaoLiuRenPalaces[dayPositionIndex];
-    processHtml += `<p>② 从月上【${monthPositionName}】起初一，顺数到【${lunarData.IDayCn}】，落在【<b>${dayPositionName}</b>】</p>`;
-
+    const monthPositionIndex = (lunarData.lMonth - 1) % 6;
+    const dayPositionIndex = (monthPositionIndex + lunarData.lDay - 1) % 6;
     const finalIndex = (dayPositionIndex + hourIndex) % 6;
-    const finalResultName = xiaoLiuRenPalaces[finalIndex];
-    processHtml += `<p>③ 从日上【${dayPositionName}】起子时，顺数到【${currentHourBranch}时】，最终落在【<b>${finalResultName}</b>】</p>`;
+    
+    const processHtml = `
+        <p>① 从【大安】起正月，顺数到农历【${lunarData.IMonthCn}】，落在【<b>${xiaoLiuRenPalaces[monthPositionIndex]}</b>】</p>
+        <p>② 从月上【${xiaoLiuRenPalaces[monthPositionIndex]}】起初一，顺数到【${lunarData.IDayCn}】，落在【<b>${xiaoLiuRenPalaces[dayPositionIndex]}</b>】</p>
+        <p>③ 从日上【${xiaoLiuRenPalaces[dayPositionIndex]}】起子时，顺数到【${calendar.Zhi[hourIndex]}时】，最终落在【<b>${xiaoLiuRenPalaces[finalIndex]}</b>】</p>`;
     
     document.getElementById('time-calculation-process').innerHTML = processHtml;
-    displayResult(finalResultName);
+    displayResult(xiaoLiuRenPalaces[finalIndex], 'time-result-container');
 }
 
-/**
- * 按随机数字推算
- */
 function runNumberCalculation() {
-    const num1 = parseInt(document.getElementById('num1').value);
-    const num2 = parseInt(document.getElementById('num2').value);
-    const num3 = parseInt(document.getElementById('num3').value);
+    const num1 = parseInt(document.getElementById('num1').value) || 0;
+    const num2 = parseInt(document.getElementById('num2').value) || 0;
+    const num3 = parseInt(document.getElementById('num3').value) || 0;
 
-    if (isNaN(num1) || isNaN(num2) || isNaN(num3) || num1 <= 0 || num2 <= 0 || num3 <= 0) {
+    if (num1 <= 0 || num2 <= 0 || num3 <= 0) {
         alert("请输入三个有效的正整数！");
         return;
     }
     
-    let processHtml = '';
     const pos1Index = (num1 - 1) % 6;
-    const pos1Name = xiaoLiuRenPalaces[pos1Index];
-    processHtml += `<p>① 从【大安】起1，顺数到数字【${num1}】，落在【<b>${pos1Name}</b>】</p>`;
-
     const pos2Index = (pos1Index + num2 - 1) % 6;
-    const pos2Name = xiaoLiuRenPalaces[pos2Index];
-    processHtml += `<p>② 从上一宫位【${pos1Name}】起1，顺数到数字【${num2}】，落在【<b>${pos2Name}</b>】</p>`;
-    
     const finalIndex = (pos2Index + num3 - 1) % 6;
-    const finalResultName = xiaoLiuRenPalaces[finalIndex];
-    processHtml += `<p>③ 从上一宫位【${pos2Name}】起1，顺数到数字【${num3}】，最终落在【<b>${finalResultName}</b>】</p>`;
+    
+    const processHtml = `
+        <p>① 从【大安】起1，顺数到数字【${num1}】，落在【<b>${xiaoLiuRenPalaces[pos1Index]}</b>】</p>
+        <p>② 从上一宫位【${xiaoLiuRenPalaces[pos1Index]}】起1，顺数到数字【${num2}】，落在【<b>${xiaoLiuRenPalaces[pos2Index]}</b>】</p>
+        <p>③ 从上一宫位【${xiaoLiuRenPalaces[pos2Index]}】起1，顺数到数字【${num3}】，最终落在【<b>${xiaoLiuRenPalaces[finalIndex]}</b>】</p>`;
 
     document.getElementById('number-calculation-process').innerHTML = processHtml;
-    displayResult(finalResultName);
+    displayResult(xiaoLiuRenPalaces[finalIndex], 'number-result-container');
 }
 
-/**
- * 显示最终结果和解卦内容
- * @param {string} palaceName - 最终推算出的宫位名称
- */
-function displayResult(palaceName) {
+function displayResult(palaceName, containerId) {
     const interpretation = palaceInterpretations[palaceName];
     if (!interpretation) return;
 
-    const resultContainer = document.getElementById('result-container');
+    const resultContainer = document.getElementById(containerId);
     
-    // 更新内容
-    document.getElementById('final-result-name').textContent = palaceName;
-    document.getElementById('final-result-fortune').textContent = interpretation.fortune;
-    document.getElementById('result-meaning').textContent = interpretation.meaning;
-    document.getElementById('result-analysis').textContent = interpretation.analysis;
+    // 使用template克隆一个新的结果结构，避免重复写HTML
+    const template = document.getElementById('result-template');
+    const newResult = template.content.cloneNode(true);
 
-    // 更新样式
-    resultContainer.className = 'result ' + interpretation.fortuneClass;
+    newResult.querySelector('.result-name').textContent = palaceName;
+    newResult.querySelector('.result-fortune').textContent = interpretation.fortune;
+    newResult.querySelector('.result-meaning').textContent = interpretation.meaning;
+    newResult.querySelector('.result-analysis').textContent = interpretation.analysis;
+
+    resultContainer.innerHTML = ''; // 清空旧内容
+    resultContainer.appendChild(newResult); // 添加新内容
     
-    // 显示结果区域
-    resultContainer.style.display = 'block';
+    // 更新样式并显示
+    resultContainer.className = 'result ' + interpretation.fortuneClass;
+    resultContainer.classList.add('show');
 }
